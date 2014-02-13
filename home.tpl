@@ -5,6 +5,6 @@
 </head>
 <body>
 <h1>ready to bloom!?</h1>
-<p>{ <a href="/join">join</a> } { <a href="/login">login</a> }</p>
+<p>. <a href="/join">join</a> .. <a href="/login">login</a> .</p>
 </body>
 </html>

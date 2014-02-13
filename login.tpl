@@ -12,6 +12,6 @@ password<input type="password" name="pass" />
 <br>
 <input type="submit" name="submit" value="Spire" />
 </form>
-<p>{ <a href="">trunk</a> }</p>
+<p>{ <a href="/">trunk</a> }</p>
 </body>
 </html>

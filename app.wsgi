@@ -9,6 +9,8 @@ application = bottle.default_app()
 
 import MySQLdb
 import sqlite3
+import uuid
+import hashlib
 from bottle import route, request, template
 
 @route('/')
@@ -23,17 +25,22 @@ def login():
 @route('/login', method="POST")
 def login():
     
-	username = request.POST.get('user','').strip()
-	password = request.POST.get('pass','').strip()
+	username = request.POST.get('user')
+	password = request.POST.get('pass')
 
 	db=MySQLdb.connect(host="localhost",user="sauce",passwd="tomato",db="bloom")
 	cur = db.cursor() 
 	cur.execute("SELECT password FROM user WHERE username='" + username + "';")
 	response = cur.fetchall()
-
+	cur.close()
 	if response:
-	    if response[0][0] == password:
-		    return "logged in"
+		hashed_password = response[0][0]
+		hpassword, salt = hashed_password.split(':')
+		passwordCorrect = hpassword == hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+    
+	if response:
+	    if passwordCorrect:
+		    return "logged in!"
 	    else:
 		    return "incorrect!"
 	else:
@@ -48,14 +55,17 @@ def join():
 @route('/join', method="POST")
 def join():
     
-    username = request.POST.get('user','').strip()
-    password = request.POST.get('pass','').strip()
+    username = request.POST.get('user')
+    password = request.POST.get('pass')
+    
+    salt = uuid.uuid4().hex
+    password_hash = hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
     
     db=MySQLdb.connect(host="localhost",user="sauce",passwd="tomato",db="bloom")
     
     cur = db.cursor() 
     
-    cur.execute("insert into user(username, password) values('" + username + "','" + password + "');")
+    cur.execute("insert into user(username, password) values('" + username + "','" + password_hash + "');")
     response = cur.fetchall()
     db.commit()
     cur.close()
